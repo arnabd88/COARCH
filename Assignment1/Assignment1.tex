@@ -36,7 +36,7 @@
 	      \toprule
 		  \multicolumn{6}{|c|}{Execution Times(S)}  \\
 	      \midrule 
-		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{WSum}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
+		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{ArithMean}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
 		  $\textbf{BASE}$ & 3 & 2.5 & 1 & 12 & 4.625 \\
 		  $\textbf{NEW1}$ & 7 & 3 & 5 & 1 & 4 \\
 		  $\textbf{NEW2}$ & 2 & 1 & 3 & 8 & 3.5 \\
@@ -80,7 +80,7 @@
 			Power = \dfrac{Energy}{Time} 
 		\]
 
-		we can construct the table for $power$ consumption using the corresponding values of energy and execution-times from the given tables using the above equation. Table ~\ref{tab:abs-power} shows the above construction
+		we can construct the table for $power$ consumption using the corresponding values of energy and execution-times from the given tables using the above equation. Table ~\ref{tab:abs-power} shows the above construction. To evaluate the system with ;least power consumption, we perform the arithmatic mean also shown in $ArithMean$ field of ~\ref{tab:abs-power}.
 
 	\begin{table}[!htb]
 	    \centering
@@ -104,14 +104,26 @@
 
 \newpage
 \section{$\textbf{Optimizing CPU Time}$}
-	Let the total instruction count be $x$. Thus we have the following count of instructions per type of instructions
-	\begin{eqnarray*}
-		\mbox{Load} &=& 0.1 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.2x \\
-		\mbox{Store} &=& 0.05 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.05x \\
-		\mbox{Branch} &=& 0.05 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.1x \\
-		\mbox{ADD} &=& 0.3 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.3x \\
-		\mbox{MULT} &=& 0.5 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 2x \\
-	\end{eqnarray*}
+	Let the total instruction count be $x$. Thus we have the following count of instructions per type of instructions and the number of cycle per instruction is shown in ~\ref{tab:old-cpi}.
+	\begin{table}[!htb]
+	    \centering
+	    \fontfamily{ppl}\selectfont
+		\renewcommand{\arraystretch}{3.0}
+		\label{tab:old-cpi}
+	    \begin{tabular}{c|c|c|c|c}
+	      \toprule
+		  $Instr\ Type$ & $Frequency$ & $Num\ of\ Instr$ & $Cycle\ per\ Instr$ & $Total\ Cycles\ per\ Instr$ \\
+	      \midrule 
+		  $Load$ & $10\%$ & $0.1x$ & $2$ & $0.2x$ \\
+		  $Store$ & $5\%$ & $0.05x$ & $1$ & $0.05x$ \\
+		  $Branch$ & $5\%$ & $0.05x$ & $2$ & $0.1x$ \\
+		  $ADD$ & $30\%$ & $0.3x$ & $1$ & $0.3x$ \\
+		  $MULT$ & $50\%$ & $0.5x$ & $4$ & $2x$ \\
+	      \bottomrule
+	    \end{tabular}
+	    \caption{ Data for OLD CPI  }
+	  \end{table}
+	
 
 	Thus the Old CPI will be 
 	\[\mbox{CPI}_{old} = \dfrac{0.2x + 0.05x + 0.1x + 0.3x + 2x}{x} = 2.65 \]
@@ -119,14 +131,29 @@
 	Hence, the old IPC will be
 	\[\mbox{IPC}_{old} = \dfrac{1}{2.65} = 0.377 \]
 
-	Given that $60\%$ of the MULT instructions could be combined with ADD, we observe that $60\%$ of the MULT instructions is $\textbf{0.3x}$. Thus all the ADD instructions get combined with the MULT instructions , leaving $0.2x$ MULT instructions that are unfused. Thus, the new bunch of instrcutions and their cycle count will be as follows
-	\begin{eqnarray*}
-		\mbox{Load} &=& 0.1 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.2x \\
-		\mbox{Store} &=& 0.05 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.05x \\
-		\mbox{Branch} &=& 0.05 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.1x \\
-		\mbox{MULT} &=& 0.2 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.8x \\
-		\mbox{FMAD} &=& 0.3 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 1.2x \\
-	\end{eqnarray*}
+	Given that $60\%$ of the MULT instructions could be combined with ADD, we observe that $60\%$ of the MULT instructions is $\textbf{0.3x}$. Thus all the ADD instructions get combined with the MULT instructions , leaving $0.2x$ MULT instructions that are unfused. Thus, the new bunch of instrcutions and their cycle count will be as shown in ~\ref{tab:new-cpi}
+
+	\begin{table}[!htb]
+	    \centering
+	    \fontfamily{ppl}\selectfont
+		\renewcommand{\arraystretch}{3.0}
+		\label{tab:new-cpi}
+	    \begin{tabular}{c|c|c|c|c}
+	      \toprule
+		  $Instr\ Type$ & $Num\ of\ Instr$ & $New\ Frequency$ & $Cycle\ per\ Instr$ & $Total\ Cycles\ per\ Instr$ \\
+	      \midrule 
+		  $Load$  & $0.1x$ & $14.2\%$ & $2$ & $0.2x$ \\
+		  $Store$ & $0.05x$ & $7.14\%$ & $1$ & $0.05x$ \\
+		  $Branch$ & $0.05x$ & $7.14\%$ & $2$ & $0.1x$ \\
+		  $MULT$  & $0.2x$ & $28.5\%$ & $4$ & $0.8x$ \\
+		  $FMAD$  & $0.3x$ & $42.85\%$ & $4$ & $1.2x$ \\
+	      \bottomrule
+	    \end{tabular}
+	    \caption{ Data for NEW CPI  }
+	  \end{table}
+
+	  Note that the $frequencies$ have been adjusted by dividing by the new total instruction count of $\mathbf{0.7}x$.
+	
 
 	Thus the New CPI will be
 	\[\mbox{CPI}_{new} = \dfrac{0.2x + 0.05x + 0.1x + 0.8x + 1.2x}{0.1x + 0.05x + 0.05x + 0.2x + 0.3x} = 3.35 \]
@@ -144,7 +171,7 @@
 		Speed-up = \dfrac{Exec_{old}}{Exec_{new}} = \dfrac{2.65x}{2.35x} = 1.127
 	\]
 
-	Thus there is a net speedup of $1.127$ using $FMAD$.
+	Thus there is a net speedup of $1.127$ using $\textbf{FMAD}$ for the given problem.
 
 \newpage
 \section{$\textbf{Amdahl's Law}$}
@@ -256,7 +283,7 @@
 		\begin{eqnarray*}
 			\mbox{New Total Energy} &=& (P_s + 0.7 P_d) \dfrac{T_{exec}}{0.7} \\
 			&=& = (30 + 0.7 \times 70) \dfrac{15}{0.7} \\
-			&=& 1692
+			&=& 1692\ Joules
 		\end{eqnarray*}
 
 		\boxed{New\ Total\ Energy = 1692\ Joules}
