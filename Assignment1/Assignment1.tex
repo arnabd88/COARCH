@@ -1,6 +1,6 @@
 \documentclass{tufte-handout}
 
-\title{Partial Differential Equations: An Overview\thanks{CS 6220: Spring 2018: SoC, UoU}}
+\title{Assignment-1: Performance Metrics}
   
   \author[]{Arnab Das, u1014840}
   
@@ -17,13 +17,17 @@
 
  \setcounter{secnumdepth}{1}
 
+\newpage
+\section{$\textbf{Summarizing Performance Numbers}$}
+	\paragraph{Execution Time:} The expected execution time for each machine can be derived as the arithmetic mean of the individual execution times since the probability of executing each program is equal. Arithmetic mean is defined as 
+	
+	  \[
+	  	ArithMean = \dfrac{\sum_{i=1}^{n=4} x_i}{n}
+	  \]
 
-\section{$\textbf{1. Summarizing Performance Numbers}$}
-	 \paragraph{Execution Time} To find the system with the least execution time, we consider the execution times in the $\textbf{BASE}$ system as reference to relativise how fast or how slow the benchmarks programs execute in the other systems. To do this, consider the execution time encountered in the $\textbf{BASE}$ system as the reference for the corresponding benchmark program, and divide the execution numbers from the other system by the reference value. Hence, the reciprocal of the execution number in the $\textbf{BASE}$ system serves as the weights as shown in Table ~\ref{tab:exec-time}. The $\textbf{weighted sum}$(Wsum) is evaluated as:
-		\[ Wsum = \dfrac{1}{n} \sum_{i=1}^{n=4} w_i x_i\]
-	Thus the system $\textbf{NEW3}$ has the least execution  time, considering they are equally probable to be executed. Note that the $\textbf{Wsum}$ values do not have any unit and is a relative quantity with respect to that of $\textbf{BASE}$.
+	The evaluation is summarised in ~\ref{tab:exec-time}
 
-	\begin{table}[!h]
+	\begin{table}[!htb]
 	    \centering
 	    \fontfamily{ppl}\selectfont
 		\renewcommand{\arraystretch}{3.0}
@@ -33,18 +37,24 @@
 		  \multicolumn{6}{|c|}{Execution Times(S)}  \\
 	      \midrule 
 		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{WSum}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
-		  $\textbf{BASE}$ & $\dfrac{3}{3}=1.00$ & $\dfrac{2.5}{2.5}=1.0$ & $\dfrac{1}{1} = 1.0$ & $\dfrac{12}{12} = 1.0$ & 1.0 \\ 
-		  $\textbf{NEW1}$ & $\dfrac{7}{3}=2.33$ & $\dfrac{3}{2.5} = 1.2$ & $\dfrac{5}{1} = 5.0$ & $\dfrac{1}{12} = 0.08$ & $2.15$ \\ 
-		  $\textbf{NEW2}$ & $\dfrac{2}{3}=0.67$ & $\dfrac{1}{2.5} = 0.4$ & $\dfrac{3}{1} = 3.0$ & $\dfrac{8}{12} = 0.67$ & $1.1825$ \\ 
-		  $\textbf{NEW3}$ & $\dfrac{1}{3}=0.33$ & $\dfrac{3}{2.5} = 1.2$ & $\dfrac{2}{1} = 2.0$ & $\dfrac{13}{12} = 1.08$ & $1.15$ \\
+		  $\textbf{BASE}$ & 3 & 2.5 & 1 & 12 & 4.625 \\
+		  $\textbf{NEW1}$ & 7 & 3 & 5 & 1 & 4 \\
+		  $\textbf{NEW2}$ & 2 & 1 & 3 & 8 & 3.5 \\
+		  $\textbf{NEW3}$ & 1 & 3 & 2 & 13 & 4.75 \\
 	      \bottomrule
 	    \end{tabular}
-	    \caption{ Relativise execution times }
+	    \caption{ execution times }
 	  \end{table}
 
-	  \paragraph{Energy: } Similarly, for the energy table we relativise the energy conumption values of the benchmark programs on the new system with respect to the $\textbf{BASE}$ system by taking it as the reference. The evaluations are shown in the table ~\ref{tab:exec-energy}. 
+	  Thus, the computer system resulting in least execution time is $\textbf{NEW2}$.
 	
-	\begin{table}[!ht]
+
+	  \paragraph{Energy: } Similarly, for the least energy consumption we evaluate the arithmetic mean of the energy values over all the programs for each system. The evaluated  arithmetic mean for energy table is shown in ~\ref{tab:exec-energy} 
+	  
+
+	  The evaluations are shown in the table ~\ref{tab:exec-energy}. 
+	
+	\begin{table}[!htb]
 	    \centering
 	    \fontfamily{ppl}\selectfont
 		\renewcommand{\arraystretch}{3.0}
@@ -53,14 +63,14 @@
 	      \toprule
 		  \multicolumn{6}{|c|}{System Energy(J)}  \\
 	      \midrule 
-		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{WSum}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
-		  $\textbf{BASE}$ & $\dfrac{20}{20}=1.00$ & $\dfrac{40}{40} = 1.00$ & $\dfrac{50}{50} = 1.00$ & $\dfrac{15}{15}$ & 1 \\ 
-		  $\textbf{NEW1}$ & $\dfrac{10}{20}=0.50$ & $\dfrac{30}{40} = 0.75$ & $\dfrac{15}{50} = 0.30$ & $\dfrac{30}{15} = 2.00$ & $0.88$ \\ 
-		  $\textbf{NEW2}$ & $\dfrac{30}{20}=1.50$ & $\dfrac{60}{40} = 1.50$ & $\dfrac{20}{50} = 0.40$ & $\dfrac{20}{15} = 1.33$ & $1.18$ \\ 
-		  $\textbf{NEW3}$ & $\dfrac{70}{20}=3.50$ & $\dfrac{30}{40} = .875$ & $\dfrac{30}{50} = 0.60$ & $\dfrac{10}{15} = 0.67$ & $1.41$ \\
+		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{ArithMean}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
+		  $\textbf{BASE}$ & 20 & 40 & 50 & 15 & 31.25 \\
+		  $\textbf{NEW1}$ & 10 & 30 & 15 & 30 & 21.25 \\
+		  $\textbf{NEW2}$ & 30 & 60 & 20 & 20 & 32.5 \\
+		  $\textbf{NEW3}$ & 70 & 35 & 30 & 10 & 36.25 \\
 	      \bottomrule
 	    \end{tabular}
-	    \caption{ Relativise Energy Values }
+	    \caption{ Energy Consumption }
 	  \end{table}
 
 	  Thus the system $\textbf{NEW1}$ has the least energy consumption.
@@ -72,27 +82,28 @@
 
 		we can construct the table for $power$ consumption using the corresponding values of energy and execution-times from the given tables using the above equation. Table ~\ref{tab:abs-power} shows the above construction
 
-	\begin{table}[!ht]
+	\begin{table}[!htb]
 	    \centering
 	    \fontfamily{ppl}\selectfont
 		\renewcommand{\arraystretch}{3.0}
 		\label{tab:abs-power}
-	    \begin{tabular}{c|c|c|c|c}
+	    \begin{tabular}{c|c|c|c|c|c}
 	      \toprule
-		  \multicolumn{5}{|c|}{System Power(W)}  \\
+		  \multicolumn{6}{|c|}{System Power(W)}  \\
 	      \midrule 
-		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
-		  $\textbf{BASE}$ & $\dfrac{20}{3}=6.67$ & $\dfrac{40}{2.5} = 16$ & $\dfrac{50}{1} = 50$ & $\dfrac{15}{12}$ \\ 
-		  $\textbf{NEW1}$ & $\dfrac{10}{7}=1.43$ & $\dfrac{30}{3} = 10$ & $\dfrac{15}{5} = 3$ & $\dfrac{30}{1} = 30$ \\ 
-		  $\textbf{NEW2}$ & $\dfrac{30}{2}=15$ & $\dfrac{60}{1} = 60$ & $\dfrac{20}{3} = 6.67$ & $\dfrac{20}{8} = 2.5$ \\ 
-		  $\textbf{NEW3}$ & $\dfrac{70}{1}=70$ & $\dfrac{35}{3} = 11.67$ & $\dfrac{30}{2} = 15$ & $\dfrac{10}{13} = 0.77$ \\
+		  $\textbf{System}$ & $\textbf{A}$ & $\textbf{B}$ & $\textbf{C}$ & $\textbf{D}$ & $\textbf{AirthMean}$\\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
+		  $\textbf{BASE}$ & $\dfrac{20}{3}=6.67$ & $\dfrac{40}{2.5} = 16$ & $\dfrac{50}{1} = 50$ & $\dfrac{15}{12} = 1.25$  & 18.48 \\ 
+		  $\textbf{NEW1}$ & $\dfrac{10}{7}=1.43$ & $\dfrac{30}{3} = 10$ & $\dfrac{15}{5} = 3$ & $\dfrac{30}{1} = 30$ & 11.12 \\ 
+		  $\textbf{NEW2}$ & $\dfrac{30}{2}=15$ & $\dfrac{60}{1} = 60$ & $\dfrac{20}{3} = 6.67$ & $\dfrac{20}{8} = 2.5$ & 21.04 \\ 
+		  $\textbf{NEW3}$ & $\dfrac{70}{1}=70$ & $\dfrac{35}{3} = 11.67$ & $\dfrac{30}{2} = 15$ & $\dfrac{10}{13} = 0.77$ & 24.36 \\
 	      \bottomrule
 	    \end{tabular}
 	    \caption{ System Power }
 	  \end{table}
 
 
-\section{$\textbf{1. Optimizing CPU Time}$}
+\newpage
+\section{$\textbf{Optimizing CPU Time}$}
 	Let the total instruction count be $x$. Thus we have the following count of instructions per type of instructions
 	\begin{eqnarray*}
 		\mbox{Load} &=& 0.1 x, \quad\mbox{and}, \quad\mbox{\# cycles = } 0.2x \\
@@ -135,6 +146,194 @@
 
 	Thus there is a net speedup of $1.127$ using $FMAD$.
 
+\newpage
+\section{$\textbf{Amdahl's Law}$}
+	Let the total energy consumption in the mobile device is $x$ Joules. The fractions of energy consumed by each part of the given unit can be summarized in Table:~\ref{tab:frac-tab}
+	\begin{table}[!htb]
+	    \centering
+	    \fontfamily{ppl}\selectfont
+		\renewcommand{\arraystretch}{3.0}
+		\label{tab:frac-tab}
+	    \begin{tabular}{c|c|c|c|}
+	      \toprule
+		  \multicolumn{4}{|c|}{Energy Distribution}  \\
+	      \midrule 
+		  $\textbf{Wireless Interface}$ & $\textbf{Display}$ & $\textbf{CPU}$ & $\textbf{Other}$ \\  % = \dfrac{1}{4}\sum_{i=1}^4 w_i x_i$ 
+		  $50\% \equiv \dfrac{1}{2}x$  & $20\% \equiv \dfrac{1}{5}x$ & $10\% \equiv \dfrac{1}{10}x$ & $20\% \equiv \dfrac{1}{5}x$ \\
+	      \bottomrule
+	    \end{tabular}
+	    \caption{ System Power }
+	  \end{table}
+
+	  We can apply Amdahl's law to find maximum improvement possible when some fraction of the component is improved. In this case the component is energy. We denote by $E_{overall}$ as the overall energy of the system and $f_{enhanced}$ as the franction of the enhanced component. Then the formula for the specific case of this problem in terms of energy can be summarized as:
+	  \begin{eqnarray*}
+	  	E_{overall_{new}} &=& (1 - f_{enhanced} + \dfrac{f_{enhanced}}{\mbox{Improvement speedup}}) \times E_{overall_{old}} \\
+		Speedup &=& \dfrac{E_{overall_{old}}}{E_{overall_{new}}}
+	  \end{eqnarray*}
+
+	  Where, in case of energy, the $Improvement\ speedup$ can be defined as
+	  \[
+	  	\mbox{Improvement speedup} = \dfrac{Energy_{enehanced_{old}}}{Energy_{enhanced_{new}}}
+	  \]
+
+	  Applying the above set of formulae to the given cases for energy optimization
+
+	  \subsection{$\textbf{Reduce wireless interface energy by 10\%}$}
+	  	Then we get improvement speedup and the new Overall energy as
+		\begin{eqnarray*}
+			\mbox{Improvement Speedup} &=& \dfrac{Energy_{enehanced_{old}}}{Energy_{enhanced_{new}}} = \dfrac{\dfrac{x}{2}}{\dfrac{x}{2} - 10\%\ of \dfrac{x}{2}}\\
+			&=& \dfrac{10}{9} \\
+			E_{overall_{new}} &=& (1 - f_{enhanced} + \dfrac{f_{enhanced}}{\mbox{Improvement speedup}}) \times E_{overall_{old}} \\
+			&=& ( 1 - \dfrac{1}{2} + \dfrac{\dfrac{1}{2}}{\dfrac{10}{9}})\times E_{overall_{old}} \\
+			&=& 0.95 E_{overall_{old}}
+		\end{eqnarray*}
+
+		Thus reducing wireless interface energy by $10\%$ results in an \boxed{\mathbf{overall\ energy\ reduction\ of\ 5\%}}.
+
+	  \subsection{$\textbf{Reducing CPU energy by 60\%}$}
+	  	Then we get improvement speedup and the new Overall energy as
+		\begin{eqnarray*}
+			\mbox{Improvement Speedup} &=& \dfrac{Energy_{enehanced_{old}}}{Energy_{enhanced_{new}}} = \dfrac{\dfrac{x}{10}}{\dfrac{x}{10} - 60\%\ of \dfrac{x}{10}}\\
+			&=& \dfrac{5}{2} \\
+			E_{overall_{new}} &=& (1 - f_{enhanced} + \dfrac{f_{enhanced}}{\mbox{Improvement speedup}}) \times E_{overall_{old}} \\
+			&=& ( 1 - \dfrac{1}{10} + \dfrac{\dfrac{1}{10}}{\dfrac{5}{2}})\times E_{overall_{old}} \\
+			&=& 0.94 E_{overall_{old}}
+		\end{eqnarray*}
+		Thus reducing CPU energy by $60\%$ results in an \boxed{\mathbf{overall\ energy\ reduction\ of\ 6\%}}.
+
+	  \subsection{$\textbf{Reducing display energy by 50\%}$}
+	  	Then we get improvement speedup and the new Overall energy as
+		\begin{eqnarray*}
+			\mbox{Improvement Speedup} &=& \dfrac{Energy_{enehanced_{old}}}{Energy_{enhanced_{new}}} = \dfrac{\dfrac{x}{10}}{\dfrac{x}{5} - 50\%\ of \dfrac{x}{5}}\\
+			&=& 2 \\
+			E_{overall_{new}} &=& (1 - f_{enhanced} + \dfrac{f_{enhanced}}{\mbox{Improvement speedup}}) \times E_{overall_{old}} \\
+			&=& ( 1 - \dfrac{1}{5} + \dfrac{\dfrac{1}{5}}{2})\times E_{overall_{old}} \\
+			&=& 0.90 E_{overall_{old}}
+		\end{eqnarray*}
+		Thus reducing display energy by $50\%$ results in an \boxed{\mathbf{overall\ energy\ reduction\ of\ 10\%}}.
+
+		Thus, we see that the third option of reducing display energy by $50\%$ gives the best improvement in energy saving since the overall energy gets reduced by $10\%$.
+
+
+\newpage
+\section{$\textbf{Power and Energy}$}
+	Given,
+	\begin{eqnarray*}
+		\mbox{Frequency, } f &=& 2Ghz \\
+		\mbox{Dynamic power, } P_d &=& 70 W \\
+		\mbox{Static power, } P_s &=& 30 W \\
+		T_{exec} &=& 15 s \\
+	\end{eqnarray*}
+
+	\subsection{i. Compute the energy consumed for executing the application:}
+		\begin{eqnarray*}
+			\mbox{Total Energy} &=& (P_s + P_d)\times T_{exec} \\
+			&=& (70 + 30) \times 15 Joules \\
+			&=& 1500 Joules
+		\end{eqnarray*}
+
+		\boxed{Total\ Energy = 1500\ Joules}
+
+	\subsection{ii. Energy consumption of frequency scales down by 30\%:}
+		Scaling down frequency affects inversely the executuin time as well, and the Dynamic power component.
+		The new frequency and execution time will be
+		\begin{eqnarray*}
+			f_{new} &=& 0.7 f \\
+			T_{exec_{new}} &=& \dfrac{T_{exec}}{0.7} 
+		\end{eqnarray*}
+
+		The dynamic power componnet is expressed as 
+		\[
+			Power_{dyn} = Activity \times Capacitance \times Voltage^2 \times Frequency
+		\]
+		In dynamic power, all the other components remaining same, the dynamic power scales by the same amount that frequency scales.
+		Hence, the new dynamic power is
+		\[
+			P_{d_{new}} = 0.7 \times P_d
+		\]
+
+		Thus, the new energy consumption be comes:
+		\begin{eqnarray*}
+			\mbox{New Total Energy} &=& (P_s + 0.7 P_d) \dfrac{T_{exec}}{0.7} \\
+			&=& = (30 + 0.7 \times 70) \dfrac{15}{0.7} \\
+			&=& 1692
+		\end{eqnarray*}
+
+		\boxed{New\ Total\ Energy = 1692\ Joules}
+
+	\subsection{iii. Energy consumption if both voltage and frequency scale down by 30\%:}
+	Additionally if we scale the voltage down by $30\%$, it affects both dynamic power and static power as shown.  
+	\begin{eqnarray*}
+		P_{static} &=& Current \times Voltage = 0.7 \times P_s \\
+		P_{dynamic} &=& Activity \times Capacitance \times Voltage^2 \times Frequency = (0.7)^3 \times P_d
+	\end{eqnarray*}
+	\begin{eqnarray*}
+		\mbox{New Total Energy} &=& ( 0.7 \times P_s + (0.7)^3 \times P_d) \times \dfrac{15}{0.7} = 964.5 Joules
+	\end{eqnarray*}
+		\boxed{New\ Total\ Energy = 964.5\ Joules}
+
+\newpage
+\section{Instruction set Architecture}
+	\begin{itemize}
+		\item $\textbf{LOAD R5, 6000(R0)}$
+			\begin{eqnarray*}
+			\mbox{Effective Address} &=& 6000 + [R0] = 6000 + 1000 = 7000 \\
+			R5 &\leftarrow& Mem[7000] \\
+			R5 &\leftarrow& 1
+			\end{eqnarray*}
+			Calculates the effective address as shown of $7000$, then load the data from memory address $7000$ into R5. R5 is updated to 1
+
+		\item $\textbf{ADD R4, (R4)}$
+		\begin{eqnarray*}
+			\mbox{Effective Address} &=& Mem[R4] = 6000 \\
+			R4 &\leftarrow& R4 + Mem[6000] = 6000+12 = 6012 \\
+		\end{eqnarray*}
+	
+		\item $\textbf{SUB R2, R1}$
+			\begin{eqnarray*}
+				R2 &\leftarrow& R2 - R1 \\
+				R2 &\leftarrow& 99 - 25 = 74 \\
+			\end{eqnarray*}
+
+		\item $\textbf{LOAD R6, @(R0)}$
+			\begin{eqnarray*}
+				\mbox{Effective Address} &=& Mem[R0] = Mem[1000] = 3000 \\
+				R6 &\leftarrow& Mem[3000] \\
+				R6 &\leftarrow& 33
+			\end{eqnarray*}
+
+		\item $\textbf{ADD R6, R4}$
+			\begin{eqnarray*}
+				R6 &\leftarrow& R6 + R4 \\
+				R6 &\leftarrow& 33 + 6012 \\
+				R6 &\leftarrow& 6045
+			\end{eqnarray*}
+
+		\item $\textbf{SUB R5, R6}$
+			\begin{eqnarray*}
+				R5 &\leftarrow& R5 - R6 \\
+				R5 &\leftarrow& 1 - 6045 \\
+				R5 &\leftarrow& - 6044 \\
+			\end{eqnarray*}
+
+		\item $\textbf{ADD R2, R5}$
+			\begin{eqnarray*}
+				R2 &\leftarrow& R2 + R5 \\
+				R2 &\leftarrow& 74 - 6044 \\
+				R2 &\leftarrow& -5970 \\
+			\end{eqnarray*}
+
+		\item $\textbf{ADD R2, (R3+R0)}$
+			\begin{eqnarray*}
+				\mbox{Effective Address} &=& R3 + R0 = 4000 + 1000 = 5000 \\
+				R2 &\leftarrow& R2 + Mem[5000] \\
+				R2 &\leftarrow& -5970 + 71 \\
+				R2 &\leftarrow& -5899 \\
+			\end{eqnarray*}
+
+	\end{itemize}
+
+		
   \bibliography{cs6810}
   \bibliographystyle{plainnat}
   
