@@ -88,6 +88,43 @@
   \]
 
   \section{$\textbf{Multi-cycle Intructions}$}
+  The following assumptions are made while developing the timing diagram for the given sequence of instructions.
+  \begin{itemize}
+  	\item Separate instruction and data memory exists, that is, an instruction fetch and a data memory access can happen in the same cycle.
+	\item The register file has two ports. One port is exclusively for read and the other port is exclusively for write. Moreover, data is written to the register file in the first half of the clock and read in the second half of the clock. This implies that a write back and read of the same register location can happen in the same cycle without hazard.
+	\item The pipeline implements all necessary forwarding for the ALU operations. 
+  \end{itemize}
+	\begin{figure}[h!]
+	\label{fig:hazard}
+	\centering
+	\includegraphics[width = 6in, height = 6in]{hazards}
+	\caption{Timing Diagram}
+	\end{figure}
+
+	Figure:~\ref{fig:hazard} shows the timing diagram for the given sequence of instructions for both out of order write backs and inorder write backs. The first stall we see is in cycle 5 for MUL instruction. Register read for MUL requires updated $\textbf{F2}$, which is not available in the register file until cycle 6. If register read was issued for MUL in cycle 5, it would cause $\textbf{data hazard}$, since it would read the stale value of $F2$. Note that the stall in cycle 5 for MUL instruction means it is still in the $IS$ stage of the pipeline. Hence, the $IF$ stage of SUB instruction also gets stalled for one more cycle.
+	\paragraph{} For the DIV instruction, its register read includes register $F0$, which is an output of MUL instruction.  The register read for DIV in cycle 9 may read the stale value of $F0$ because $F0$ actually becomes available in the pipeline registers at the end cycle 9, and written back to register file in cycle 10. However, since we start the execution of DIV in cycle 10, the available forwarding paths for ALU ops allows the generated $F0$ value to be made available to the execution stage in cycle 10, thus avoiding data hazard and also avoiding a stall.
+	\paragraph{} The second table shows the in order write backs to prevent imprecise exceptions. 
+ \subsection{$\textbf{Structural and Data Hazards}$}
+  	\begin{itemize}
+		\item $\textbf{Structural Hazard}$
+			\begin{itemize}
+				\item If we consider unified memory that is data and instruction reside in the same memory, then we have structural hazards at cycle 4, which involves a instruction fetch and a load memory in the same cycle.
+				\item Further we delay the IS stage  for SUB(similarly for ADD) by 1 cycle else it would have been competing for IS stage of MUL causing structural hazard.
+			\end{itemize}
+		\item $\textbf{Data Hazard}$
+			\begin{itemize}
+				\item RAW: Reading $F6$ in SUB instruction after writing to $F6$ in the LOAD instruction.
+				\item RAW: Reading $F6$ in DIV instruction after writing to $F6$ in the LOAD instruction.
+				\item RAW: Reading $F2$ in MUL instruction after writing to $F2$ in the LOAD instruction.
+				\item RAW: Reading $F2$ in ADD instruction after writing to $F2$ in the LOAD instruction.
+				\item RAW: Reading $F0$ in DIV instruction after writing to $F0$ in the MUL instruction.
+				\item RAW: Reading $F8$ in STORE instruction after writing to $F8$ in the SUB instruction.
+				\item WAW: Writing to $F6$ in ADD instruction after writing to $F6$ in the LOAD instruction.
+				\item WAR: No Hazards.
+				\item RAR: No Hazards.
+			\end{itemize}
+	\end{itemize}
+
 
   \section{$\textbf{Points of Production and Consumption}$}
     In the unpipelined processor, it is given that the total circuit delay to execute an instruction is $T = 36 ns$, with a latch overhead of $T_{ovh} = 0.5 ns$. In the unpipelined case, the distance between POC and POP does not matters since the cycle time includes the duration spent in the entire circuit. Hence, the unpipelined cycle time will be
@@ -105,7 +142,20 @@
 		T^\prime = T/12 = 3ns
 	\]
 
-	Thus the 12 ns delay between POP and POC in the unpipelined case maps to 4 cycles in the 12-stage pipelined scenario.
+	Thus the 12 ns delay between POP and POC in the unpipelined case maps to 4 cycles in the 12-stage pipelined scenario. Thus the stage of POP is followed by three stall cycles followed by the stage of POC in the pipelined version. It is given that half the instructions do not introduce data hazard and half the instructions depend on their preceeding instruction. This means each instruction that is a producer is followed by 3 stall cycles followed by a consumer. Thus every 5 cycles it consumes 2 instructions. Hence the IPC will be
+	\[
+		IPC = \dfrac{2}{5} = 0.4
+	\]
+
+	The cycle time in the 12 stage pipeline will be
+	\[
+		CT_{pipe} = T/12 + T_{ovh} = 3 ns + 0.5 ns = 3.5 ns
+	\]
+
+	Hence the throughput(IPS) will be
+	\[
+		IPS = \dfrac{IPC}{CT_{pipe}} = \dfrac{0.4}{3.5 ns} = \mathbf{114.28 \times 10^6}
+	\]
 
 
 		
