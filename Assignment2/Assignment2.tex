@@ -1,0 +1,115 @@
+\documentclass{tufte-handout}
+
+\title{Assignment-2: Pipelining}
+  
+  \author[]{Arnab Das, u1014840}
+  
+  %\date{28 March 2010} % without \date command, current date is supplied
+  
+  %\geometry{showframe} % display margins for debugging page layout
+  
+  \input{preamble}
+  
+  \begin{document}
+  
+  \maketitle% this prints the handout title, author, and date
+  
+
+ \setcounter{secnumdepth}{1}
+
+\newpage
+ \section{$\textbf{Pipelining Performance}$}
+ 	\subsection{$\textbf{i.}$} In a single cycle processor, with IPC/CPI = 1, the CPU time will be
+	\[ CPU\_time = IC  \times CT = 1000 \times 10 ns = 10 \mu s\]
+	
+	
+ 	\subsection{$\textbf{ii.}$}
+	We denote the 1ns aditional delay for pipeline registers as 
+	\[
+		T_{ovh} = 1ns
+	\]
+
+	Let $T$ denote the cycle time for a single-cycle processor. In this case, $T = 10 ns$. Let $T_{ovh}$ denote the additional delay at every pipeline stage. Hence, $T_{ovh}=1ns$. 
+	The cycle time for the unpipelined case will be
+	\[
+		CT_{unpipe} = T + T_{ovh}
+	\]
+
+	and the cycle time for the 10-stage pipelined case will be
+	\[
+		CT_{pipe} = \dfrac{T}{10} + T_{ovh}
+	\]
+
+	For the unpipelined case, it flushes 1 instruction per cycle since no stalls are required due to absence of hazards. 
+	For the 10-stage pipelined case, every 10 cycles req1uires 2 additional stall cycles. Thus it flushes 10 instructions every 12 cycles. Hence the CPI for the pipelined case will be
+	\[
+		CPI_{pipe} = \dfrac{\# cycles}{\# instr} = \dfrac{12}{10} = 1.2
+	\]
+
+	Since the instrcution count in both cases is the same, the execution times will be
+	\begin{eqnarray*}
+		Exec\_Time_{unpipe} &=& IC_{unpipe} \times CPI_{unpipe} \times CT_{unpipe} = 1000 \cdot 1 \cdot (T + T_{ovh}) \\
+		Exec\_Time_{pipe} &=& IC_{pipe} \times CPI_{pipe} \times CT_{pipe} = 1000 \cdot 1.2 \cdot (\dfrac{T}{10} + T_{ovh}) 
+	\end{eqnarray*}
+
+	Thus, we get the following speedup
+	\begin{eqnarray*}
+		Speedup &=& \dfrac{Exec\_Time_{unpipe}}{Exec\_Time_{pipe}} \\
+		&=& \dfrac{1000 \cdot 1 \cdot (T + T_{ovh})}{1000 \cdot 1.2 \cdot (\dfrac{T}{10} + T_{ovh})} \\
+		&=& \dfrac{11}{1.2 \cdot (1 + 1)} = \mathbf{4.58}
+	\end{eqnarray*}
+
+  \section{$\textbf{Control Hazards}$}
+  Let the total number of intructions be $x$. Given that only branch instructions introduce stalls.
+  The total number of branch instructions ,
+  \[
+  	\# total\ branches = 20\%\ of\ x = \dfrac{x}{5}
+  \]
+
+  Each branch introduces 2 additional stall cycles. Given that in the case of a branch being taken, it is allowed to move two instructions from the taken side into the branch delay slot, wich implies that in case of $60\%$ of the branches being taken some useful work is being done in the stall cycles and hence there is effectively no stall cycles in the \emph{taken} case. The remaining $40\%$ of the branches which results in branches not being taken consequently leads to 2 stall cycles each. 
+  Number of branch instructions not taken will be
+  \[
+  	\mbox{\# branches not taken} = 40\%\ of\ \dfrac{x}{5} = \dfrac{2x}{25}
+  \]
+
+  and total number of stalls introduced will be
+  \[
+  	\#\ total\ stalls = 2 \times \mbox{\# branches not taken} = \dfrac{4x}{25}
+  \]
+
+  Hence, total number of cycles
+  \[
+  	 \#\ total\ cycles = \#\ useful\ cycles + \#\ stall\ cycles = x + \dfrac{4x}{25} = \dfrac{29x}{25}
+  \]
+
+  Hence, the expected CPI will be
+  \[
+  	CPI_{expected} = \dfrac{\#\ total\ cycles}{\#\ total\ instrs} = \dfrac{\dfrac{29x}{25}}{x} = \mathbf{1.16}
+  \]
+
+  \section{$\textbf{Multi-cycle Intructions}$}
+
+  \section{$\textbf{Points of Production and Consumption}$}
+    In the unpipelined processor, it is given that the total circuit delay to execute an instruction is $T = 36 ns$, with a latch overhead of $T_{ovh} = 0.5 ns$. In the unpipelined case, the distance between POC and POP does not matters since the cycle time includes the duration spent in the entire circuit. Hence, the unpipelined cycle time will be
+	\[
+		CT_{unpipe} = T + T_{ovh} = 36.5 ns
+	\]
+
+	and its throughput(IPS) will be 
+	\[
+		IPS_{unpipe} = \dfrac{1}{36.5 \times 10^{-9}} = \mathbf{27.39 \times 10^6}
+	\]
+
+	In case of a 12 stage pipelined processor, the time spent per stage in the combinational circuit(excluding the latching stage) is
+	\[
+		T^\prime = T/12 = 3ns
+	\]
+
+	Thus the 12 ns delay between POP and POC in the unpipelined case maps to 4 cycles in the 12-stage pipelined scenario.
+
+
+		
+  \bibliography{cs6810}
+  \bibliographystyle{plainnat}
+  
+  \end{document}
