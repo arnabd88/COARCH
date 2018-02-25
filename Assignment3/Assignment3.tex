@@ -62,7 +62,7 @@
 	\end{eqnarray*}
 
 \section{$\textbf{Question 2}$}
-	\subsection{$\textbf{Optiized without unrolling}$}
+	\subsection{$\textbf{Optimized without unrolling}$}
 		\begin{eqnarray*}
 			Loop : & & \mbox{ L.D\quad F2,\quad 0(R2)} \\
 			       & & \mbox{ L.D\quad F3,\quad 0(R3)} \\
@@ -76,6 +76,41 @@
 			       & & \mbox{ BNE\quad R2,\quad R1,\quad Loop} \\
 			       & & \mbox{ S.D\quad F5,\quad 8(R5)} \\
 		\end{eqnarray*}
+
+
+\section{$\textbf{Question 3}$}
+	\subsection{$\textbf{i. Optimized without unrolling}$}
+		\begin{alignat*}{3}
+			Loop : & & \mbox{ L.D\quad F1,\quad 0(R1)}            \quad\quad\quad       &&      \\
+			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-8} \quad\quad\quad      &&      \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8}  \quad\quad\quad     &&  \mbox{F.MUL\quad F3,\quad F1,\quad F2}    \\
+			       & & \mbox{ Stall }  \quad\quad\quad      &&  \mbox{ Stall }     \\
+			       & & \mbox{ Stall }  \quad\quad\quad      &&  \mbox{ F.ADD\quad F5,\quad F3, \quad F4}     \\
+			       & & \mbox{ Stall }  \quad\quad\quad      && \\ 
+			       & & \mbox{ Stall }  \quad\quad\quad      && \\
+			       & & \mbox{ Stall }  \quad\quad\quad      && \\
+			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop}  \quad\quad\quad      &&  \\
+			       & & \mbox{ S.D\quad F5,\quad 8(R2)}  \quad\quad\quad      &&   \\
+		\end{alignat*}
+
+	\subsection{$\textbf{ii. Optimized with loop unrolling}$}
+		\begin{alignat*}{3}
+			Loop : & & \mbox{ L.D\quad F1, 0(R1) }             \quad\quad\quad       &&    \\
+			       & & \mbox{ L.D\quad F11, -8(R1)}             \quad\quad\quad       &&    \\
+			       & & \mbox{ L.D\quad F12, -16(R1)}             \quad\quad\quad       &&  \mbox{ F.MUL\quad F3,\quad F1,\quad F2 }   \\
+			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.MUL\quad F31,\quad F11,\quad F2}   \\
+			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.ADD\quad F5,\quad F3,\quad F4}   \\
+			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.MUL\quad F32,\quad F12,\quad F2}   \\
+			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.ADD\quad F51,\quad F31,\quad F4}   \\
+			       & & \mbox{ Stall }             \quad\quad\quad       &&   \mbox{F.ADD\quad F52,\quad F32,\quad F4} \\
+			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-24}             \quad\quad\quad       &&    \\
+			       & & \mbox{ S.D\quad F5, 0(R2)}             \quad\quad\quad       &&    \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-24}             \quad\quad\quad       &&    \\
+			       & & \mbox{ S.D\quad F51, 16(R2)}             \quad\quad\quad       &&    \\
+			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop }             \quad\quad\quad       &&    \\
+			       & & \mbox{ S.D\quad F52, 8(R2)}             \quad\quad\quad       &&    \\
+		\end{alignat*}
+		
 		
 
 		
