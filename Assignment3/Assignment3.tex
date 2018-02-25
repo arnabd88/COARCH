@@ -1,0 +1,85 @@
+\documentclass{tufte-handout}
+
+\title{Assignment-2: Pipelining}
+  
+  \author[]{Arnab Das, u1014840}
+  
+  %\date{28 March 2010} % without \date command, current date is supplied
+  
+  %\geometry{showframe} % display margins for debugging page layout
+  
+  \input{preamble}
+  
+  \begin{document}
+  
+  \maketitle% this prints the handout title, author, and date
+  
+
+ \setcounter{secnumdepth}{1}
+
+\newpage
+
+  \section{$\textbf{Question 1}$}
+  	\subsection{$\textbf{i.\ optimized schedule without unrolling}$}
+		\begin{eqnarray*}
+			Loop : & & \mbox{L.D \quad F1,\quad0(R1) }\\
+			       & & \mbox{L.D \quad F2,\quad 0(R2) }\\
+				   & & \mbox{DADDUI \quad R1,\quad R1,\quad \#-8  }\\
+				   & & \mbox{MUL \quad F3,\quad F1,\quad F2  }\\
+				   & & \mbox{DADDUI \quad R2,\quad R2,\quad \#-8  }\\
+				   & & \mbox{DADDUI \quad R3, \quad R3, \quad \#-8  }\\
+				   & & \mbox{STALL  }\\
+				   & & \mbox{BNE \quad R1,\quad R4,\quad Loop } \\
+				   & & \mbox{S.D \quad F3,\quad 8(R3) } \\
+		\end{eqnarray*}
+
+	\subsection{$\textbf{ii.\ With unrolling}$}
+		\begin{eqnarray*}
+			Loop : & & \mbox{L.D\quad F1, 0(R1)} \\
+			       & & \mbox{L.D\quad F2, 0(R2)} \\
+			       & & \mbox{L.D\quad F11, -8(R1)} \\
+			       & & \mbox{MUL\quad F3,\quad F1,\quad F2} \\
+			       & & \mbox{L.D\quad F22,\quad -8(R2)} \\
+			       & & \mbox{DADDUI\quad R1,\quad R1,\quad \#-16} \\
+			       & & \mbox{MUL\quad F33,\quad F11,\quad F22} \\
+			       & & \mbox{DADDUI\quad R2,\quad R2,\quad \#-16} \\
+			       & & \mbox{S.D\quad F3,\quad 0(R3)} \\
+			       & & \mbox{DADDUI\quad R3,\quad R3,\quad \#-16} \\
+			       & & \mbox{BNE\quad R1,\quad R4,\quad Loop} \\
+			       & & \mbox{S.D\quad F33,\quad 8(R3)} \\
+		\end{eqnarray*}
+
+	\subsection{$\textbf{iii.\ Software pipelined}$}
+	\begin{eqnarray*}
+		Loop : & & \mbox{ S.D\quad F3,\quad 16(R3) } \\
+		       & & \mbox{ MUL\quad F3,\quad F1,\quad F2} \\
+		       & & \mbox{ L.D\quad F1,\quad 0(R2)} \\
+		       & & \mbox{ L.D\quad F2,\quad 0(R1)} \\
+		       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-8} \\
+		       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8} \\
+		       & & \mbox{ BNE\quad R1,\quad R4,\quad Loop} \\
+		       & & \mbox{ DADDUI\quad R3,\quad R3,\quad \#-8} \\
+	\end{eqnarray*}
+
+\section{$\textbf{Question 2}$}
+	\subsection{$\textbf{Optiized without unrolling}$}
+		\begin{eqnarray*}
+			Loop : & & \mbox{ L.D\quad F2,\quad 0(R2)} \\
+			       & & \mbox{ L.D\quad F3,\quad 0(R3)} \\
+			       & & \mbox{ L.D\quad F4,\quad 0(R4)} \\
+			       & & \mbox{ MUL\quad F1,\quad F2,\quad F3} \\
+			       & & \mbox{ ADD\quad F5,\quad F4, \quad F1} \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R3,\quad R3,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R4,\quad R4,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R5,\quad R5,\quad \#-8} \\
+			       & & \mbox{ BNE\quad R2,\quad R1,\quad Loop} \\
+			       & & \mbox{ S.D\quad F5,\quad 8(R5)} \\
+		\end{eqnarray*}
+		
+
+		
+  \bibliography{cs6810}
+  \bibliographystyle{plainnat}
+  
+  \end{document}
