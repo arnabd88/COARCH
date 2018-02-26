@@ -1,6 +1,6 @@
 \documentclass{tufte-handout}
 
-\title{Assignment-2: Pipelining}
+\title{Assignment-3: Instruction Level Parallelism}
   
   \author[]{Arnab Das, u1014840}
   
@@ -19,8 +19,29 @@
 
 \newpage
 
+	In the optimizations below, $\textbf{assumption}$ has been made of an $\textbf{infinite/large enough register space}$ for both $\textbf{integer and FP pipelines}$.
+
   \section{$\textbf{Question 1}$}
+  	The Base case with the stalls inserted looks like
+	\begin{eqnarray*}
+		Loop : & & \mbox{ L.D\quad F1,\quad 0(R1) }   \\
+		       & & \mbox{ L.D\quad F2,\quad 0(R2) }   \\
+		       & & \mbox{ \stall }   \\
+		       & & \mbox{ MUL\quad F3,\quad F1,\quad F2}   \\
+		       & & \mbox{ \stall }   \\
+		       & & \mbox{ \stall }   \\
+		       & & \mbox{ \stall }   \\
+		       & & \mbox{ \stall }   \\
+		       & & \mbox{ S.D\quad F3,\quad 0(R3) }   \\
+		       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-8 }   \\
+		       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8 }   \\
+		       & & \mbox{ DADDUI\quad R3,\quad R3,\quad \#-8 }   \\
+		       & & \mbox{ BNE\quad R1,\quad R4,\quad Loop }   \\
+		       & & \mbox{ NOP }   \\
+	\end{eqnarray*}
+
   	\subsection{$\textbf{i.\ optimized schedule without unrolling}$}
+  	With the optimized schedule without unrolling we get $\textbf{1 Stall}$. The first stall is removed by scheduling the $DADDUI$ for $R1$. Similarly, the other stalls are replaced with useful work done by two more $DADDUI$ for $R2$ and $R3$ respectively. Also, the $S.D$ is moved after the $BNE$ to take advantage of the 1 branch-delay slot. Ultimately we are left with 1 stall.
 		\begin{eqnarray*}
 			Loop : & & \mbox{L.D \quad F1,\quad0(R1) }\\
 			       & & \mbox{L.D \quad F2,\quad 0(R2) }\\
@@ -28,12 +49,13 @@
 				   & & \mbox{MUL \quad F3,\quad F1,\quad F2  }\\
 				   & & \mbox{DADDUI \quad R2,\quad R2,\quad \#-8  }\\
 				   & & \mbox{DADDUI \quad R3, \quad R3, \quad \#-8  }\\
-				   & & \mbox{STALL  }\\
+				   & & \mbox{\stall  }\\
 				   & & \mbox{BNE \quad R1,\quad R4,\quad Loop } \\
 				   & & \mbox{S.D \quad F3,\quad 8(R3) } \\
 		\end{eqnarray*}
 
 	\subsection{$\textbf{ii.\ With unrolling}$}
+	Optimizing with unrolling 2 times, results in $\textbf{no stall cycles}$ in the schedule. Here the first stall is removed by executing one more Load for the additionally unrolled statements for the loop. Successive stalls are removed by fetching one more load for the unrolled section of the loop and also the $DADDUI$ instructions for iterator decrement. Here as well, the last store is moved after the $BNE$ to take advantage of the branch delay slot.
 		\begin{eqnarray*}
 			Loop : & & \mbox{L.D\quad F1, 0(R1)} \\
 			       & & \mbox{L.D\quad F2, 0(R2)} \\
@@ -50,19 +72,44 @@
 		\end{eqnarray*}
 
 	\subsection{$\textbf{iii.\ Software pipelined}$}
+	In the software pipelined case, the inner kernel without the prologue and the epilogue comprises of no stalls. Here, during the store of the $i'th$ iteration, the $MUL$ operation of $(i-1)'th$ iteration and the $LOAD$ for the $(i-2)'th$ iteration is executed.  
+
 	\begin{eqnarray*}
 		Loop : & & \mbox{ S.D\quad F3,\quad 16(R3) } \\
 		       & & \mbox{ MUL\quad F3,\quad F1,\quad F2} \\
-		       & & \mbox{ L.D\quad F1,\quad 0(R2)} \\
-		       & & \mbox{ L.D\quad F2,\quad 0(R1)} \\
+		       & & \mbox{ L.D\quad F1,\quad 0(R1)} \\
+		       & & \mbox{ L.D\quad F2,\quad 0(R2)} \\
 		       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-8} \\
 		       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8} \\
-		       & & \mbox{ BNE\quad R1,\quad R4,\quad Loop} \\
 		       & & \mbox{ DADDUI\quad R3,\quad R3,\quad \#-8} \\
+		       & & \mbox{ BNE\quad R1,\quad R4,\quad Loop} \\
 	\end{eqnarray*}
 
 \section{$\textbf{Question 2}$}
 	\subsection{$\textbf{Optimized without unrolling}$}
+		The Base case with stalls will be
+		\begin{eqnarray*}
+			Loop : & & \mbox{ L.D\quad F2,\quad 0(R2)} \\
+			       & & \mbox{ L.D\quad F3,\quad 0(R3)} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ MULT.D\quad F1,\quad F2,\quad F3} \\
+			       & & \mbox{ L.D\quad F4,\quad 0(R4)} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ ADD.D\quad F5,\quad F4,\quad F1} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ \stall} \\
+			       & & \mbox{ S.D\quad F5,\quad 0(R5)} \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R3,\quad R3,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R4,\quad R4,\quad \#-8} \\
+			       & & \mbox{ DADDUI\quad R5,\quad R5,\quad \#-8} \\
+		       	   & & \mbox{ BNE\quad R2,\quad R1,\quad Loop} \\
+		       	   & & \mbox{ NOP} \\
+		\end{eqnarray*}
+
+		Optimizing without unrolling results in $\textbf{no stall}$ cycles. The mechanism to remove stalls is similar as earlier.
 		\begin{eqnarray*}
 			Loop : & & \mbox{ L.D\quad F2,\quad 0(R2)} \\
 			       & & \mbox{ L.D\quad F3,\quad 0(R3)} \\
@@ -80,36 +127,86 @@
 
 \section{$\textbf{Question 3}$}
 	\subsection{$\textbf{i. Optimized without unrolling}$}
+		Optimized without unrolling. There 5 stalls in the integer pipeline and 1 stall in the FP pipeline. Also, we have a situation of both pipelines being stalled.
 		\begin{alignat*}{3}
 			Loop : & & \mbox{ L.D\quad F1,\quad 0(R1)}            \quad\quad\quad       &&      \\
 			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-8} \quad\quad\quad      &&      \\
 			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-8}  \quad\quad\quad     &&  \mbox{F.MUL\quad F3,\quad F1,\quad F2}    \\
-			       & & \mbox{ Stall }  \quad\quad\quad      &&  \mbox{ Stall }     \\
-			       & & \mbox{ Stall }  \quad\quad\quad      &&  \mbox{ F.ADD\quad F5,\quad F3, \quad F4}     \\
-			       & & \mbox{ Stall }  \quad\quad\quad      && \\ 
-			       & & \mbox{ Stall }  \quad\quad\quad      && \\
-			       & & \mbox{ Stall }  \quad\quad\quad      && \\
+			       & & \mbox{ \stall }  \quad\quad\quad      &&  \mbox{ \stall }     \\
+			       & & \mbox{ \stall }  \quad\quad\quad      &&  \mbox{ F.ADD\quad F5,\quad F3, \quad F4}     \\
+			       & & \mbox{ \stall }  \quad\quad\quad      && \\ 
+			       & & \mbox{ \stall }  \quad\quad\quad      && \\
+			       & & \mbox{ \stall }  \quad\quad\quad      && \\
 			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop}  \quad\quad\quad      &&  \\
 			       & & \mbox{ S.D\quad F5,\quad 8(R2)}  \quad\quad\quad      &&   \\
 		\end{alignat*}
 
 	\subsection{$\textbf{ii. Optimized with loop unrolling}$}
+	The $\textbf{limiting case for unrolling with 4 stalls}$ is shown here which still has $\textbf{1 stall}$ concurrently in each pipeline. Then the case for $\textbf{unrolling 5 times}$ is shown that removes the stalls .
+	\paragraph{$\textbf{unroll 4}$}
 		\begin{alignat*}{3}
-			Loop : & & \mbox{ L.D\quad F1, 0(R1) }             \quad\quad\quad       &&    \\
-			       & & \mbox{ L.D\quad F11, -8(R1)}             \quad\quad\quad       &&    \\
-			       & & \mbox{ L.D\quad F12, -16(R1)}             \quad\quad\quad       &&  \mbox{ F.MUL\quad F3,\quad F1,\quad F2 }   \\
-			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.MUL\quad F31,\quad F11,\quad F2}   \\
-			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.ADD\quad F5,\quad F3,\quad F4}   \\
-			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.MUL\quad F32,\quad F12,\quad F2}   \\
-			       & & \mbox{ Stall }             \quad\quad\quad       && \mbox{F.ADD\quad F51,\quad F31,\quad F4}   \\
-			       & & \mbox{ Stall }             \quad\quad\quad       &&   \mbox{F.ADD\quad F52,\quad F32,\quad F4} \\
-			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-24}             \quad\quad\quad       &&    \\
-			       & & \mbox{ S.D\quad F5, 0(R2)}             \quad\quad\quad       &&    \\
-			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-24}             \quad\quad\quad       &&    \\
-			       & & \mbox{ S.D\quad F51, 16(R2)}             \quad\quad\quad       &&    \\
+			Loop : & & \mbox{ L.D\quad F1,\quad 0(R1)}       \quad\quad\quad    &&   \\
+			       & & \mbox{ L.D\quad F11,\quad -8(R1)}       \quad\quad\quad    &&   \\
+			       & & \mbox{ L.D\quad F12,\quad -16(R1)}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F3,\quad F1,\quad F2  }  \\
+			       & & \mbox{ L.D\quad F13,\quad -24(R1)}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F31,\quad F11,\quad F2  }   \\
+			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-32}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F32,\quad F12,\quad F2  }  \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-32}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F33,\quad F13,\quad F2  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F5,\quad F3,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F51,\quad F31,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F52,\quad F32,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F53,\quad F33,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F3,\quad 32(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F31,\quad 24(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F32,\quad 16(R2) }       \quad\quad\quad    &&    \\
 			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop }             \quad\quad\quad       &&    \\
-			       & & \mbox{ S.D\quad F52, 8(R2)}             \quad\quad\quad       &&    \\
+			       & & \mbox{ S.D\quad F33,\quad 8(R2) }       \quad\quad\quad    &&    \\
 		\end{alignat*}
+
+		Note that, even for unroll of 4, by moving one of the $DADDUI$ instructions to the location where both pipelines are stalled, we could remove the stall by making the integer pipeline execute, but that is not an optimal schedule since that introduces an earlier stall where some useful work could have been done.
+
+	\paragraph{$\textbf{unroll 5}$}
+	The issue of both pipelines being stalled at the same time is solved here with $\textbf{unrolling}$ it $\textbf{5 times}$.
+%		\begin{alignat*}{3}
+%			Loop : & & \mbox{ L.D\quad F1, 0(R1) }             \quad\quad\quad       &&    \\
+%			       & & \mbox{ L.D\quad F11, -8(R1)}             \quad\quad\quad       &&    \\
+%			       & & \mbox{ L.D\quad F12, -16(R1)}             \quad\quad\quad       &&  \mbox{ F.MUL\quad F3,\quad F1,\quad F2 }   \\
+%			       & & \mbox{ \stall }             \quad\quad\quad       && \mbox{F.MUL\quad F31,\quad F11,\quad F2}   \\
+%			       & & \mbox{ \stall }             \quad\quad\quad       && \mbox{F.ADD\quad F5,\quad F3,\quad F4}   \\
+%			       & & \mbox{ \stall }             \quad\quad\quad       && \mbox{F.MUL\quad F32,\quad F12,\quad F2}   \\
+%			       & & \mbox{ \stall }             \quad\quad\quad       && \mbox{F.ADD\quad F51,\quad F31,\quad F4}   \\
+%			       & & \mbox{ \stall }             \quad\quad\quad       &&   \mbox{F.ADD\quad F52,\quad F32,\quad F4} \\
+%			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-24}             \quad\quad\quad       &&    \\
+%			       & & \mbox{ S.D\quad F5, 0(R2)}             \quad\quad\quad       &&    \\
+%			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-24}             \quad\quad\quad       &&    \\
+%			       & & \mbox{ S.D\quad F51, 16(R2)}             \quad\quad\quad       &&    \\
+%			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop }             \quad\quad\quad       &&    \\
+%			       & & \mbox{ S.D\quad F52, 8(R2)}             \quad\quad\quad       &&    \\
+%		\end{alignat*}
+
+		\begin{alignat*}{3}
+			Loop : & & \mbox{ L.D\quad F1,\quad 0(R1)}       \quad\quad\quad    &&   \\
+			       & & \mbox{ L.D\quad F11,\quad -8(R1)}       \quad\quad\quad    &&   \\
+			       & & \mbox{ L.D\quad F12,\quad -16(R1)}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F3,\quad F1,\quad F2  }  \\
+			       & & \mbox{ L.D\quad F13,\quad -24(R1)}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F31,\quad F11,\quad F2  }   \\
+			       & & \mbox{ L.D\quad F14,\quad -32(R1)}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F32,\quad F12,\quad F2  }  \\
+			       & & \mbox{ DADDUI\quad R1,\quad R1,\quad \#-40}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F33,\quad F13,\quad F2  }  \\
+			       & & \mbox{ DADDUI\quad R2,\quad R2,\quad \#-40}       \quad\quad\quad    &&  \mbox{ F.MUL\quad F34,\quad F14,\quad F2  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F5,\quad F3,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F51,\quad F31,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F52,\quad F32,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F53,\quad F33,\quad F4  }  \\
+			       & & \mbox{ \stall }       \quad\quad\quad    &&  \mbox{ F.ADD\quad F54,\quad F34,\quad F4  }  \\
+			       & & \mbox{ S.D\quad F3,\quad 40(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F31,\quad 32(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F32,\quad 24(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ S.D\quad F33,\quad 16(R2) }       \quad\quad\quad    &&    \\
+			       & & \mbox{ BNE\quad R1,\quad R3,\quad Loop }             \quad\quad\quad       &&    \\
+			       & & \mbox{ S.D\quad F34,\quad 8(R2) }       \quad\quad\quad    &&    \\
+		\end{alignat*}
+
+		With unrolling $5$ times, it is able to execute 23 instructions in 18 cycles, resulting in an $\textbf{IPC = }1.27$.
+		Unrolling it further $6$ times, results in an $\textbf{IPC = }1.35$. Attempting until $10$ unrolls, gave an $\textbf{IPC =}1.53$, wheres the base case optimized schedule without unrolling had an $\textbf{IPC = 0.7}$.
 		
 		
 
